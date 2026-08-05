@@ -1,14 +1,16 @@
 {
+  "layout": "ecl",
   "sections": {
     "ecl_banner": {
       "type": "ecl-banner",
       "settings": {
-        "brand": "LOUIS VUITTON",
-        "heading": "Spring Collection",
-        "text": "Discover the latest silhouettes crafted for the season.",
-        "shop_label": "Shop now",
-        "choose_label": "choose yours",
-        "show_nav": true
+        "logo_text": "TISSO VISON",
+        "header_message": "Find the ideal gift for your loved ones.",
+        "choose_label": "CHOOSE GIFT",
+        "heading": "The Gift Guide",
+        "text": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.",
+        "shop_label": "SHOP NOW",
+        "strip_text": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
       }
     },
     "ecl_grid": {
