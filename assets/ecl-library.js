@@ -64,9 +64,11 @@
     var trigger = qs('[data-ecl-size-trigger]', root);
     var list = qs('[data-ecl-size-list]', root);
     var label = qs('[data-ecl-size-label]', root);
-    if (!trigger || !list) return;
+    if (!trigger || !list || !label) return;
 
-    trigger.addEventListener('click', function () {
+    trigger.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
       var open = root.classList.toggle('is-open');
       trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
@@ -74,8 +76,11 @@
     list.addEventListener('click', function (event) {
       var option = event.target.closest('.ecl-size-option');
       if (!option) return;
-      var value = option.getAttribute('data-value');
+      event.preventDefault();
+      event.stopPropagation();
+      var value = option.getAttribute('data-value') || option.textContent.trim();
       label.textContent = value;
+      trigger.classList.add('has-value');
       root.dataset.selected = value;
       qsa('.ecl-size-option', list).forEach(function (btn) {
         var active = btn === option;
@@ -218,10 +223,14 @@
     product.options.forEach(function (optionName, index) {
       var values = uniqueOptionValues(product, index);
       if (!values.length) return;
-      self.selected[optionName] = values[0];
-      if (optionLooksLikeColor(optionName) || (!optionLooksLikeSize(optionName) && index === 0 && values.length <= 4)) {
+      var isColor =
+        optionLooksLikeColor(optionName) ||
+        (!optionLooksLikeSize(optionName) && index === 0 && values.length <= 4);
+      if (isColor) {
+        self.selected[optionName] = values[0];
         self.fields.appendChild(self.buildColorField(optionName, values));
       } else {
+        self.selected[optionName] = '';
         self.fields.appendChild(self.buildSizeField(optionName, values));
       }
     });
@@ -234,23 +243,18 @@
     wrap.setAttribute('data-ecl-color', '');
     wrap.dataset.optionName = optionName;
     wrap.dataset.selected = values[0];
-    wrap.innerHTML = '<span class="ecl-color__label">' + optionName + '</span><div class="ecl-color__options" role="listbox"></div>';
+    wrap.innerHTML =
+      '<span class="ecl-color__label">' + optionName + '</span>' +
+      '<div class="ecl-color__options" role="listbox"></div>';
     var options = qs('.ecl-color__options', wrap);
     values.forEach(function (value, i) {
-      var lower = value.toLowerCase();
-      var swatch = '#000000';
-      if (lower.indexOf('white') !== -1) swatch = '#FFFFFF';
-      else if (lower.indexOf('blue') !== -1) swatch = '#0D499F';
-      else if (lower.indexOf('grey') !== -1 || lower.indexOf('gray') !== -1) swatch = '#AFAFB7';
-      else if (lower.indexOf('red') !== -1) swatch = '#B20F36';
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ecl-color__option' + (i === 0 ? ' is-selected' : '');
       btn.setAttribute('data-value', value);
+      btn.setAttribute('role', 'option');
       btn.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-      btn.innerHTML =
-        '<span class="ecl-color__swatch" style="background:' + swatch + '" aria-hidden="true"></span>' +
-        '<span>' + value + '</span>';
+      btn.textContent = value;
       options.appendChild(btn);
     });
     initColorSelect(wrap);
