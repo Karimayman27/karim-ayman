@@ -1,0 +1,12 @@
+{%- comment -%}
+  Plus trigger (opens product popup)
+{%- endcomment -%}
+<button
+  type="button"
+  class="ecl-icon-btn ecl-icon-btn--plus{% if class != blank %} {{ class }}{% endif %}"
+  data-ecl-open-popup
+  {% if product_id != blank %}data-product-id="{{ product_id }}"{% endif %}
+  aria-label="{{ aria_label | default: 'Open product details' | escape }}"
+>
+  <span class="ecl-icon-btn__plus" aria-hidden="true"></span>
+</button>

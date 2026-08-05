@@ -1,0 +1,82 @@
+{{ 'ecl-library.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ecl-library.js' | asset_url }}" defer="defer"></script>
+
+<section class="ecl-grid" id="ecl-grid-{{ section.id }}">
+  <ul class="ecl-grid__list">
+    {%- for block in section.blocks -%}
+      {%- assign product = block.settings.product -%}
+      <li class="ecl-grid__item" {{ block.shopify_attributes }}>
+        {%- if product != blank -%}
+          {%- if product.featured_media -%}
+            {%- assign product_alt = product.featured_media.alt | default: product.title -%}
+            {{
+              product.featured_media
+              | image_url: width: 1200
+              | image_tag:
+                class: 'ecl-grid__image',
+                loading: 'lazy',
+                widths: '375, 550, 750, 1100',
+                sizes: '(min-width: 750px) 33vw, 100vw',
+                alt: product_alt
+            }}
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'ecl-grid__image' }}
+          {%- endif -%}
+
+          <div class="ecl-grid__trigger">
+            <button
+              type="button"
+              class="ecl-icon-btn ecl-icon-btn--plus"
+              data-ecl-open-popup
+              data-product-handle="{{ product.handle }}"
+              data-product-url="{{ product.url }}"
+              aria-label="View {{ product.title | escape }}"
+            >
+              <span class="ecl-icon-btn__plus" aria-hidden="true"></span>
+            </button>
+          </div>
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'ecl-grid__image' }}
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  {% render 'ecl-product-popup' %}
+</section>
+
+{% schema %}
+{
+  "name": "ECL Product Grid",
+  "tag": "section",
+  "class": "section-ecl-grid",
+  "max_blocks": 6,
+  "settings": [],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "ECL Product Grid",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
+    }
+  ]
+}
+{% endschema %}

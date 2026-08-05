@@ -1,0 +1,47 @@
+{%- comment -%}
+  Product popup shell — content hydrated by ecl-library.js from product JSON.
+{%- endcomment -%}
+<div
+  class="ecl-popup-overlay"
+  data-ecl-popup-overlay
+  hidden
+  aria-hidden="true"
+>
+  <div
+    class="ecl-popup"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ecl-popup-title"
+    data-ecl-popup
+  >
+    {% render 'ecl-close-button', class: 'ecl-popup__close' %}
+
+    <div class="ecl-popup__top">
+      <img
+        class="ecl-popup__image"
+        data-ecl-popup-image
+        src=""
+        alt=""
+        width="120"
+        height="140"
+      >
+      <div class="ecl-popup__meta">
+        <h2 class="ecl-popup__title" id="ecl-popup-title" data-ecl-popup-title></h2>
+        <p class="ecl-popup__price" data-ecl-popup-price></p>
+        <p class="ecl-popup__description" data-ecl-popup-description></p>
+      </div>
+    </div>
+
+    <div class="ecl-popup__fields" data-ecl-popup-fields></div>
+
+    {% render 'ecl-btn-shop-now',
+      tag: 'button',
+      type: 'button',
+      label: 'Add to cart',
+      class: 'ecl-popup__atc',
+      aria_label: 'Add to cart'
+    %}
+
+    <p class="ecl-popup__status" data-ecl-popup-status role="status" aria-live="polite"></p>
+  </div>
+</div>

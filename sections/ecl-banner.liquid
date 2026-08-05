@@ -1,0 +1,128 @@
+{{ 'ecl-library.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ecl-library.js' | asset_url }}" defer="defer"></script>
+
+<section class="ecl-banner" id="ecl-banner-{{ section.id }}">
+  <div class="ecl-banner__media">
+    {%- if section.settings.image != blank -%}
+      {%- assign banner_alt = section.settings.image.alt | default: section.settings.heading -%}
+      {{
+        section.settings.image
+        | image_url: width: 2400
+        | image_tag:
+          loading: 'eager',
+          widths: '750, 1100, 1500, 1780, 2000, 2400',
+          sizes: '100vw',
+          alt: banner_alt
+      }}
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'ecl-banner__placeholder' }}
+    {%- endif -%}
+  </div>
+
+  <div class="ecl-banner__content">
+    {%- if section.settings.brand != blank -%}
+      <p class="ecl-banner__brand">{{ section.settings.brand | escape }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank -%}
+      <h1 class="ecl-banner__heading">{{ section.settings.heading | escape }}</h1>
+    {%- endif -%}
+
+    {%- if section.settings.text != blank -%}
+      <p class="ecl-banner__text">{{ section.settings.text | escape }}</p>
+    {%- endif -%}
+
+    <div class="ecl-banner__actions">
+      {% render 'ecl-btn-shop-now',
+        label: section.settings.shop_label,
+        href: section.settings.shop_link,
+        class: 'ecl-btn--banner'
+      %}
+      {% render 'ecl-btn-choose-yours',
+        label: section.settings.choose_label,
+        href: section.settings.choose_link,
+        class: 'ecl-btn--banner'
+      %}
+    </div>
+  </div>
+
+  {%- if section.settings.show_nav -%}
+    <div class="ecl-banner__nav" aria-hidden="true">
+      <button type="button" class="ecl-banner__arrow ecl-banner__arrow--prev" tabindex="-1"></button>
+      <div class="ecl-banner__dots">
+        <button type="button" class="ecl-banner__dot is-active" tabindex="-1"></button>
+        <button type="button" class="ecl-banner__dot" tabindex="-1"></button>
+        <button type="button" class="ecl-banner__dot" tabindex="-1"></button>
+        <button type="button" class="ecl-banner__dot" tabindex="-1"></button>
+        <button type="button" class="ecl-banner__dot" tabindex="-1"></button>
+      </div>
+      <button type="button" class="ecl-banner__arrow ecl-banner__arrow--next" tabindex="-1"></button>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "ECL Banner",
+  "tag": "section",
+  "class": "section-ecl-banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background image"
+    },
+    {
+      "type": "text",
+      "id": "brand",
+      "label": "Brand",
+      "default": "LOUIS VUITTON"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Spring Collection"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Supporting text",
+      "default": "Discover the latest silhouettes crafted for the season."
+    },
+    {
+      "type": "text",
+      "id": "shop_label",
+      "label": "Shop now label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "shop_link",
+      "label": "Shop now link"
+    },
+    {
+      "type": "text",
+      "id": "choose_label",
+      "label": "Choose yours label",
+      "default": "choose yours"
+    },
+    {
+      "type": "url",
+      "id": "choose_link",
+      "label": "Choose yours link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nav",
+      "label": "Show slider navigation",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "ECL Banner"
+    }
+  ]
+}
+{% endschema %}
