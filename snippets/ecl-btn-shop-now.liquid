@@ -1,0 +1,31 @@
+{%- comment -%}
+  Component 206 — Shop now button
+  Hover: yellow fill slides from left; label/line invert to black.
+{%- endcomment -%}
+{%- liquid
+  assign label = label | default: 'Shop now'
+  assign href = href | default: '#'
+  assign tag = tag | default: 'a'
+-%}
+
+{%- if tag == 'button' -%}
+  <button
+    type="{{ type | default: 'button' }}"
+    class="ecl-btn ecl-btn--shop{% if class != blank %} {{ class }}{% endif %}"
+    {% if aria_label != blank %}aria-label="{{ aria_label | escape }}"{% endif %}
+  >
+    <span class="ecl-btn__fill" aria-hidden="true"></span>
+    <span class="ecl-btn__label">{{ label | escape }}</span>
+    <span class="ecl-btn__line" aria-hidden="true"></span>
+  </button>
+{%- else -%}
+  <a
+    href="{{ href }}"
+    class="ecl-btn ecl-btn--shop{% if class != blank %} {{ class }}{% endif %}"
+    {% if aria_label != blank %}aria-label="{{ aria_label | escape }}"{% endif %}
+  >
+    <span class="ecl-btn__fill" aria-hidden="true"></span>
+    <span class="ecl-btn__label">{{ label | escape }}</span>
+    <span class="ecl-btn__line" aria-hidden="true"></span>
+  </a>
+{%- endif -%}

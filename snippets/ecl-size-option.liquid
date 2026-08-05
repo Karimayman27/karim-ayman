@@ -1,0 +1,12 @@
+{%- comment -%}
+  Size option row (Component 212)
+{%- endcomment -%}
+<button
+  type="button"
+  class="ecl-size-option{% if selected %} is-selected{% endif %}"
+  data-value="{{ value | escape }}"
+  role="option"
+  aria-selected="{% if selected %}true{% else %}false{% endif %}"
+>
+  {{ value | escape }}
+</button>

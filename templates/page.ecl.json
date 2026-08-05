@@ -1,0 +1,36 @@
+{
+  "sections": {
+    "ecl_banner": {
+      "type": "ecl-banner",
+      "settings": {
+        "brand": "LOUIS VUITTON",
+        "heading": "Spring Collection",
+        "text": "Discover the latest silhouettes crafted for the season.",
+        "shop_label": "Shop now",
+        "choose_label": "choose yours",
+        "show_nav": true
+      }
+    },
+    "ecl_grid": {
+      "type": "ecl-product-grid",
+      "blocks": {
+        "product_1": { "type": "product", "settings": {} },
+        "product_2": { "type": "product", "settings": {} },
+        "product_3": { "type": "product", "settings": {} },
+        "product_4": { "type": "product", "settings": {} },
+        "product_5": { "type": "product", "settings": {} },
+        "product_6": { "type": "product", "settings": {} }
+      },
+      "block_order": [
+        "product_1",
+        "product_2",
+        "product_3",
+        "product_4",
+        "product_5",
+        "product_6"
+      ],
+      "settings": {}
+    }
+  },
+  "order": ["ecl_banner", "ecl_grid"]
+}

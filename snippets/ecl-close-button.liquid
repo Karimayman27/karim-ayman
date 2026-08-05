@@ -1,0 +1,11 @@
+{%- comment -%}
+  Close button (rotated X)
+{%- endcomment -%}
+<button
+  type="button"
+  class="ecl-icon-btn ecl-icon-btn--close{% if class != blank %} {{ class }}{% endif %}"
+  data-ecl-close-popup
+  aria-label="{{ aria_label | default: 'Close' | escape }}"
+>
+  <span class="ecl-icon-btn__close" aria-hidden="true"></span>
+</button>

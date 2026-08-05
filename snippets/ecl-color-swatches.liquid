@@ -1,0 +1,40 @@
+{%- comment -%}
+  Color swatches (Components 208–211)
+  Expects: option_name, values (array of option value strings), selected_value, color_map (JSON optional)
+{%- endcomment -%}
+{%- liquid
+  assign option_name = option_name | default: 'Color'
+  assign selected_value = selected_value | default: values.first
+-%}
+<div class="ecl-color" data-ecl-color data-option-name="{{ option_name | escape }}">
+  <span class="ecl-color__label">{{ option_name | escape }}</span>
+  <div class="ecl-color__options" role="listbox" aria-label="{{ option_name | escape }}">
+    {%- for value in values -%}
+      {%- liquid
+        assign swatch = '#000000'
+        assign lower = value | downcase
+        if lower contains 'white'
+          assign swatch = '#FFFFFF'
+        elsif lower contains 'blue'
+          assign swatch = '#0D499F'
+        elsif lower contains 'grey' or lower contains 'gray'
+          assign swatch = '#AFAFB7'
+        elsif lower contains 'red'
+          assign swatch = '#B20F36'
+        elsif lower contains 'black'
+          assign swatch = '#000000'
+        endif
+      -%}
+      <button
+        type="button"
+        class="ecl-color__option{% if value == selected_value %} is-selected{% endif %}"
+        role="option"
+        aria-selected="{% if value == selected_value %}true{% else %}false{% endif %}"
+        data-value="{{ value | escape }}"
+      >
+        <span class="ecl-color__swatch" style="background: {{ swatch }};" aria-hidden="true"></span>
+        <span class="ecl-color__text">{{ value | escape }}</span>
+      </button>
+    {%- endfor -%}
+  </div>
+</div>

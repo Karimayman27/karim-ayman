@@ -1,0 +1,42 @@
+{%- comment -%}
+  Size select dropdown (Component 213)
+{%- endcomment -%}
+{%- liquid
+  assign option_name = option_name | default: 'Size'
+  assign placeholder = placeholder | default: 'Choose your size'
+  assign selected_value = selected_value | default: ''
+-%}
+<div
+  class="ecl-size"
+  data-ecl-size
+  data-option-name="{{ option_name | escape }}"
+>
+  <span class="ecl-size__label">{{ option_name | escape }}</span>
+  <button
+    type="button"
+    class="ecl-size__trigger"
+    data-ecl-size-trigger
+    aria-haspopup="listbox"
+    aria-expanded="false"
+  >
+    <span class="ecl-size__trigger-text" data-ecl-size-label>
+      {%- if selected_value != blank -%}
+        {{ selected_value | escape }}
+      {%- else -%}
+        {{ placeholder | escape }}
+      {%- endif -%}
+    </span>
+    <span class="ecl-size__divider" aria-hidden="true"></span>
+    <span class="ecl-size__chevron" aria-hidden="true"></span>
+  </button>
+  <ul class="ecl-size__list" role="listbox" hidden data-ecl-size-list>
+    {%- for value in values -%}
+      <li>
+        {% render 'ecl-size-option',
+          value: value,
+          selected: false
+        %}
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
