@@ -99,6 +99,40 @@
     return valuesLookLikeColor(values);
   }
 
+  function swatchColorForValue(value) {
+    var lower = String(value || '').toLowerCase();
+    var map = [
+      ['white', '#FFFFFF'],
+      ['ivory', '#FFFFF0'],
+      ['cream', '#FFFDD0'],
+      ['black', '#000000'],
+      ['navy', '#1B2A4A'],
+      ['blue', '#0D499F'],
+      ['red', '#B20F36'],
+      ['burgundy', '#6D1A2A'],
+      ['maroon', '#800000'],
+      ['green', '#2E5A3C'],
+      ['olive', '#556B2F'],
+      ['grey', '#AFAFB7'],
+      ['gray', '#AFAFB7'],
+      ['yellow', '#E6C200'],
+      ['pink', '#E8A0BF'],
+      ['brown', '#6B3F2A'],
+      ['beige', '#D8CBB5'],
+      ['khaki', '#C3B091'],
+      ['orange', '#E36C2C'],
+      ['purple', '#6B3FA0'],
+      ['gold', '#C5A028'],
+      ['silver', '#C0C0C0'],
+      ['teal', '#008080'],
+      ['coral', '#FF7F50']
+    ];
+    for (var i = 0; i < map.length; i++) {
+      if (lower.indexOf(map[i][0]) !== -1) return map[i][1];
+    }
+    return '#C8C8C8';
+  }
+
   function initSizeSelect(root) {
     var trigger = qs('[data-ecl-size-trigger]', root);
     var list = qs('[data-ecl-size-list]', root);
@@ -301,7 +335,9 @@
       btn.setAttribute('data-value', value);
       btn.setAttribute('role', 'option');
       btn.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-      btn.textContent = value;
+      btn.innerHTML =
+        '<span class="ecl-color__swatch" style="background:' + swatchColorForValue(value) + '" aria-hidden="true"></span>' +
+        '<span class="ecl-color__name">' + value + '</span>';
       options.appendChild(btn);
     });
     initColorSelect(wrap);

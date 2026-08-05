@@ -3,7 +3,7 @@
  * No Dawn component classes. Fonts: Jost (heading) + Manrope (UI)
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
 
 :root {
   --ecl-black: #000000;
@@ -15,6 +15,7 @@
   --ecl-font: 'Manrope', sans-serif;
   --ecl-font-display: 'Jost', sans-serif;
   --ecl-font-logo: 'Jost', sans-serif;
+  --ecl-font-grid: 'Cormorant Garamond', Georgia, serif;
   --ecl-popup-w: 311px;
   --ecl-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   /* Figma frame 1440×878 */
@@ -258,6 +259,22 @@
   color: var(--ecl-black);
 }
 
+/* Figma sizes — banner CTAs */
+.ecl-banner__choose .ecl-btn--yellow {
+  box-sizing: border-box;
+  width: 207px;
+  height: 44px;
+  padding: 0 16px;
+}
+
+.ecl-banner__shop .ecl-btn--black {
+  box-sizing: border-box;
+  width: 220px;
+  height: 50px;
+  min-width: 220px;
+  padding: 0 18px;
+}
+
 .ecl-btn--block {
   width: 100%;
   max-width: 271px;
@@ -317,19 +334,30 @@
 }
 
 /* ==========================================================================
-   SECTION 2 — Product Grid
+   SECTION 2 — Product Grid ("Tisso vison in the wild")
    ========================================================================== */
 
 .ecl-grid {
   width: 100%;
+  padding: 28px clamp(12px, 2vw, 24px) 48px;
   background: var(--ecl-white);
   font-family: var(--ecl-font);
 }
 
+.ecl-grid__heading {
+  margin: 0 0 16px;
+  font-family: var(--ecl-font-grid);
+  font-weight: 500;
+  font-size: clamp(22px, 2.2vw, 28px);
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--ecl-black);
+}
+
 .ecl-grid__list {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -358,33 +386,47 @@
   background: #ececec;
   color: #888;
   font-size: 13px;
+  padding: 12px;
+  text-align: center;
 }
 
-.ecl-grid__trigger {
+.ecl-grid__hotspot {
   position: absolute;
-  top: 16px;
-  right: 16px;
   z-index: 2;
+  transform: translate(-50%, -50%);
 }
 
 .ecl-icon-btn {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: rgba(248, 248, 248, 0.9);
-  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ecl-icon-btn:hover,
+.ecl-icon-btn:focus-visible {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
+  outline: none;
+}
+
+.ecl-popup__close.ecl-icon-btn:hover,
+.ecl-popup__close.ecl-icon-btn:focus-visible {
+  transform: scale(1.08);
 }
 
 .ecl-icon-btn__glyph {
   position: relative;
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
 }
 
 .ecl-icon-btn__glyph::before,
@@ -415,8 +457,13 @@
 }
 
 @media screen and (min-width: 750px) {
+  .ecl-grid {
+    padding: 36px clamp(16px, 3vw, 40px) 64px;
+  }
+
   .ecl-grid__list {
     grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
   }
 }
 
@@ -573,14 +620,16 @@
 }
 
 .ecl-color__option {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   box-sizing: border-box;
   min-height: 36px;
   height: 36px;
   margin: 0;
-  padding: 0 8px;
+  padding: 0 10px 0 14px;
   border: none;
   border-right: 1px solid var(--ecl-black);
   background: var(--ecl-white);
@@ -592,6 +641,18 @@
   letter-spacing: -0.02em;
   text-transform: capitalize;
   color: var(--ecl-black);
+}
+
+.ecl-color__swatch {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+
+.ecl-color__name {
+  line-height: 1;
 }
 
 .ecl-color__option:last-child,
@@ -606,6 +667,10 @@
 .ecl-color__option.is-selected {
   background: var(--ecl-black);
   color: var(--ecl-white);
+}
+
+.ecl-color__option.is-selected .ecl-color__swatch {
+  border-color: rgba(255, 255, 255, 0.55);
 }
 
 .ecl-size__trigger {
