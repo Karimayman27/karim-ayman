@@ -75,8 +75,8 @@
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: 8px 12px;
-  border: 1px solid var(--ecl-black);
+  padding: 0;
+  border: none;
   font-family: var(--ecl-font-logo);
   font-weight: 500;
   font-style: normal;
@@ -195,7 +195,7 @@
   inset: 0;
   z-index: -1;
   transform: scaleX(0);
-  transform-origin: right center;
+  transform-origin: left center;
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
@@ -281,7 +281,6 @@
 
   .ecl-banner__logo {
     font-size: 12px;
-    padding: 6px 10px;
   }
 
   .ecl-banner__message {

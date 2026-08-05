@@ -29,7 +29,22 @@
     return (el.textContent || '').trim();
   }
 
+  function resolveOptionName(option) {
+    if (option == null) return '';
+    if (typeof option === 'string') return option;
+    if (typeof option === 'object' && option.name) return String(option.name);
+    return '';
+  }
+
+  function getProductOptionNames(product) {
+    return (product.options || []).map(resolveOptionName);
+  }
+
   function uniqueOptionValues(product, optionIndex) {
+    var option = product.options[optionIndex];
+    if (option && typeof option === 'object' && Array.isArray(option.values) && option.values.length) {
+      return option.values.slice();
+    }
     var map = {};
     var values = [];
     product.variants.forEach(function (variant) {
@@ -43,21 +58,45 @@
   }
 
   function findVariant(product, selected) {
+    var names = getProductOptionNames(product);
     return (
       product.variants.find(function (variant) {
         return variant.options.every(function (opt, index) {
-          return selected[product.options[index]] === opt;
+          return selected[names[index]] === opt;
         });
       }) || null
     );
   }
 
   function optionLooksLikeColor(name) {
-    return /color|colour|couleur/i.test(name);
+    return /color|colour|couleur/i.test(name || '');
   }
 
   function optionLooksLikeSize(name) {
-    return /size|taille/i.test(name);
+    return /size|taille|pointure/i.test(name || '');
+  }
+
+  function valuesLookLikeSize(values) {
+    if (!values || !values.length) return false;
+    return values.every(function (value) {
+      return /^(xxs|xs|s|m|l|xl|xxl|xxxl|2xl|3xl|4xl|5xl|6xl|\d+|medium|small|large|one size|onesize)$/i.test(
+        String(value).trim()
+      );
+    });
+  }
+
+  function valuesLookLikeColor(values) {
+    if (!values || !values.length) return false;
+    var colorWords = /white|black|blue|red|green|grey|gray|yellow|pink|brown|beige|navy|orange|purple|cream|gold|silver|ivory|khaki|olive|burgundy|maroon|teal|coral/i;
+    return values.some(function (value) {
+      return colorWords.test(String(value));
+    });
+  }
+
+  function shouldUseColorField(name, values) {
+    if (optionLooksLikeColor(name)) return true;
+    if (optionLooksLikeSize(name) || valuesLookLikeSize(values)) return false;
+    return valuesLookLikeColor(values);
   }
 
   function initSizeSelect(root) {
@@ -220,20 +259,28 @@
     this.fields.innerHTML = '';
 
     var self = this;
-    product.options.forEach(function (optionName, index) {
+    var colorFields = [];
+    var sizeFields = [];
+
+    (product.options || []).forEach(function (option, index) {
+      var optionName = resolveOptionName(option);
       var values = uniqueOptionValues(product, index);
       if (!values.length) return;
-      var isColor =
-        optionLooksLikeColor(optionName) ||
-        (!optionLooksLikeSize(optionName) && index === 0 && values.length <= 4);
-      if (isColor) {
+      if (values.length === 1 && /default title/i.test(values[0])) return;
+      if (!optionName) optionName = 'Option ' + (index + 1);
+
+      if (shouldUseColorField(optionName, values)) {
         self.selected[optionName] = values[0];
-        self.fields.appendChild(self.buildColorField(optionName, values));
+        colorFields.push(self.buildColorField(optionName, values));
       } else {
         self.selected[optionName] = '';
-        self.fields.appendChild(self.buildSizeField(optionName, values));
+        sizeFields.push(self.buildSizeField(optionName, values));
       }
     });
+
+    // Figma order: Color first, then Size
+    colorFields.forEach(function (el) { self.fields.appendChild(el); });
+    sizeFields.forEach(function (el) { self.fields.appendChild(el); });
     this.updatePrice();
   };
 
@@ -311,7 +358,9 @@
     this.syncSelectedFromDom();
     this.status.classList.remove('is-error');
 
-    var missing = this.product.options.some(function (name) {
+    var missing = getProductOptionNames(this.product).some(function (name) {
+      if (!name || /^title$/i.test(name)) return false;
+      if (!(name in self.selected)) return false;
       return !self.selected[name];
     });
     if (missing) {
