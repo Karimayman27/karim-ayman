@@ -1,42 +1,71 @@
+{%- comment -%}
+  ECL Product Grid — "Tisso vison in the wild"
+  6 product blocks (customizer), flush 2×3 grid, hotspot opens popup.
+{%- endcomment -%}
+
 {{ 'ecl-library.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'ecl-library.js' | asset_url }}" defer="defer"></script>
 
+{%- liquid
+  assign hotspot_defaults_x = '28,52,48,36,58,42' | split: ','
+  assign hotspot_defaults_y = '62,40,48,38,52,58' | split: ','
+-%}
+
 <section class="ecl-grid" id="ecl-grid-{{ section.id }}">
+  {%- if section.settings.heading != blank -%}
+    <h2 class="ecl-grid__heading">{{ section.settings.heading | escape }}</h2>
+  {%- endif -%}
+
   <ul class="ecl-grid__list">
     {%- for block in section.blocks -%}
       {%- assign product = block.settings.product -%}
-      <li class="ecl-grid__item" {{ block.shopify_attributes }}>
-        {%- if product != blank -%}
-          {%- if product.featured_media -%}
-            {%- assign product_alt = product.featured_media.alt | default: product.title -%}
-            {{
-              product.featured_media
-              | image_url: width: 1200
-              | image_tag:
-                class: 'ecl-grid__image',
-                loading: 'lazy',
-                widths: '375, 550, 750, 1100',
-                sizes: '(min-width: 750px) 33vw, 100vw',
-                alt: product_alt
-            }}
-          {%- else -%}
-            {{ 'product-1' | placeholder_svg_tag: 'ecl-grid__image' }}
-          {%- endif -%}
+      {%- assign idx = forloop.index0 -%}
+      {%- assign hx = block.settings.hotspot_x -%}
+      {%- assign hy = block.settings.hotspot_y -%}
+      {%- if hx == blank or hx == 0 -%}
+        {%- assign hx = hotspot_defaults_x[idx] | default: 50 -%}
+      {%- endif -%}
+      {%- if hy == blank or hy == 0 -%}
+        {%- assign hy = hotspot_defaults_y[idx] | default: 50 -%}
+      {%- endif -%}
 
-          <div class="ecl-grid__trigger">
-            <button
-              type="button"
-              class="ecl-icon-btn ecl-icon-btn--plus"
-              data-ecl-open-popup
-              data-product-handle="{{ product.handle }}"
-              data-product-url="{{ product.url }}"
-              aria-label="View {{ product.title | escape }}"
-            >
-              <span class="ecl-icon-btn__plus" aria-hidden="true"></span>
-            </button>
-          </div>
+      <li class="ecl-grid__item" {{ block.shopify_attributes }}>
+        {%- if product != blank and product.featured_media -%}
+          {%- assign product_alt = product.featured_media.alt | default: product.title -%}
+          {{
+            product.featured_media
+            | image_url: width: 1200
+            | image_tag:
+              class: 'ecl-grid__image',
+              loading: 'lazy',
+              widths: '375, 550, 750, 1100',
+              sizes: '(min-width: 750px) 33vw, 100vw',
+              alt: product_alt
+          }}
+          <button
+            type="button"
+            class="ecl-icon-btn ecl-grid__hotspot"
+            style="left: {{ hx }}%; top: {{ hy }}%;"
+            data-ecl-open-popup
+            data-product-handle="{{ product.handle }}"
+            aria-label="View {{ product.title | escape }}"
+          >
+            <span class="ecl-icon-btn__glyph" aria-hidden="true"></span>
+          </button>
+        {%- elsif product != blank -%}
+          <div class="ecl-grid__placeholder">{{ product.title | escape }}</div>
+          <button
+            type="button"
+            class="ecl-icon-btn ecl-grid__hotspot"
+            style="left: {{ hx }}%; top: {{ hy }}%;"
+            data-ecl-open-popup
+            data-product-handle="{{ product.handle }}"
+            aria-label="View {{ product.title | escape }}"
+          >
+            <span class="ecl-icon-btn__glyph" aria-hidden="true"></span>
+          </button>
         {%- else -%}
-          {{ 'product-1' | placeholder_svg_tag: 'ecl-grid__image' }}
+          <div class="ecl-grid__placeholder">Select a product</div>
         {%- endif -%}
       </li>
     {%- endfor -%}
@@ -51,7 +80,14 @@
   "tag": "section",
   "class": "section-ecl-grid",
   "max_blocks": 6,
-  "settings": [],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tisso vison in the wild"
+    }
+  ],
   "blocks": [
     {
       "type": "product",
@@ -61,6 +97,26 @@
           "type": "product",
           "id": "product",
           "label": "Product"
+        },
+        {
+          "type": "range",
+          "id": "hotspot_x",
+          "min": 8,
+          "max": 92,
+          "step": 1,
+          "unit": "%",
+          "label": "Hotspot horizontal position",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "hotspot_y",
+          "min": 8,
+          "max": 92,
+          "step": 1,
+          "unit": "%",
+          "label": "Hotspot vertical position",
+          "default": 50
         }
       ]
     }
@@ -69,12 +125,12 @@
     {
       "name": "ECL Product Grid",
       "blocks": [
-        { "type": "product" },
-        { "type": "product" },
-        { "type": "product" },
-        { "type": "product" },
-        { "type": "product" },
-        { "type": "product" }
+        { "type": "product", "settings": { "hotspot_x": 28, "hotspot_y": 62 } },
+        { "type": "product", "settings": { "hotspot_x": 52, "hotspot_y": 40 } },
+        { "type": "product", "settings": { "hotspot_x": 48, "hotspot_y": 48 } },
+        { "type": "product", "settings": { "hotspot_x": 36, "hotspot_y": 38 } },
+        { "type": "product", "settings": { "hotspot_x": 58, "hotspot_y": 52 } },
+        { "type": "product", "settings": { "hotspot_x": 42, "hotspot_y": 58 } }
       ]
     }
   ]

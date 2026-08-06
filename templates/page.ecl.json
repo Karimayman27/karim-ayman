@@ -1,25 +1,27 @@
 {
+  "layout": "ecl",
   "sections": {
     "ecl_banner": {
       "type": "ecl-banner",
       "settings": {
-        "brand": "LOUIS VUITTON",
-        "heading": "Spring Collection",
-        "text": "Discover the latest silhouettes crafted for the season.",
-        "shop_label": "Shop now",
-        "choose_label": "choose yours",
-        "show_nav": true
+        "logo_text": "TISSO VISON",
+        "header_message": "Find the ideal gift for your loved ones.",
+        "choose_label": "CHOOSE GIFT",
+        "heading": "The Gift Guide",
+        "text": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.",
+        "shop_label": "SHOP NOW",
+        "strip_text": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
       }
     },
     "ecl_grid": {
       "type": "ecl-product-grid",
       "blocks": {
-        "product_1": { "type": "product", "settings": {} },
-        "product_2": { "type": "product", "settings": {} },
-        "product_3": { "type": "product", "settings": {} },
-        "product_4": { "type": "product", "settings": {} },
-        "product_5": { "type": "product", "settings": {} },
-        "product_6": { "type": "product", "settings": {} }
+        "product_1": { "type": "product", "settings": { "hotspot_x": 28, "hotspot_y": 62 } },
+        "product_2": { "type": "product", "settings": { "hotspot_x": 52, "hotspot_y": 40 } },
+        "product_3": { "type": "product", "settings": { "hotspot_x": 48, "hotspot_y": 48 } },
+        "product_4": { "type": "product", "settings": { "hotspot_x": 36, "hotspot_y": 38 } },
+        "product_5": { "type": "product", "settings": { "hotspot_x": 58, "hotspot_y": 52 } },
+        "product_6": { "type": "product", "settings": { "hotspot_x": 42, "hotspot_y": 58 } }
       },
       "block_order": [
         "product_1",
@@ -29,7 +31,9 @@
         "product_5",
         "product_6"
       ],
-      "settings": {}
+      "settings": {
+        "heading": "Tisso vison in the wild"
+      }
     }
   },
   "order": ["ecl_banner", "ecl_grid"]

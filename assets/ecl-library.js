@@ -1,13 +1,11 @@
 /**
- * EcomExperts Component Library — vanilla JS
- * - Color / size selectors
- * - Product popup open/close
- * - Add to cart (+ Soft Winter Jacket when Black + Medium)
+ * ECL library — vanilla JavaScript only (no jQuery)
+ * Popup open/close, variant pickers, Add to Cart,
+ * Soft Winter Jacket auto-add when Black + Medium selected.
  */
 (function () {
   'use strict';
 
-  var MONEY_FORMAT = (window.theme && window.theme.moneyFormat) || null;
   var softWinterJacketCache = null;
 
   function qs(sel, root) {
@@ -20,27 +18,33 @@
 
   function formatMoney(cents) {
     if (typeof Shopify !== 'undefined' && typeof Shopify.formatMoney === 'function') {
-      return Shopify.formatMoney(cents, MONEY_FORMAT || undefined);
+      return Shopify.formatMoney(cents);
     }
-    var value = (Number(cents) / 100).toFixed(2).replace('.', ',');
-    return value + '€';
+    return (Number(cents) / 100).toFixed(2).replace('.', ',') + '€';
   }
 
   function stripHtml(html) {
     var el = document.createElement('div');
     el.innerHTML = html || '';
-    return (el.textContent || el.innerText || '').trim();
+    return (el.textContent || '').trim();
   }
 
-  function getOptionIndex(product, name) {
-    var lower = String(name).toLowerCase();
-    for (var i = 0; i < product.options.length; i++) {
-      if (String(product.options[i]).toLowerCase() === lower) return i;
-    }
-    return -1;
+  function resolveOptionName(option) {
+    if (option == null) return '';
+    if (typeof option === 'string') return option;
+    if (typeof option === 'object' && option.name) return String(option.name);
+    return '';
+  }
+
+  function getProductOptionNames(product) {
+    return (product.options || []).map(resolveOptionName);
   }
 
   function uniqueOptionValues(product, optionIndex) {
+    var option = product.options[optionIndex];
+    if (option && typeof option === 'object' && Array.isArray(option.values) && option.values.length) {
+      return option.values.slice();
+    }
     var map = {};
     var values = [];
     product.variants.forEach(function (variant) {
@@ -54,42 +58,102 @@
   }
 
   function findVariant(product, selected) {
-    return product.variants.find(function (variant) {
-      return variant.options.every(function (opt, index) {
-        var optionName = product.options[index];
-        return selected[optionName] === opt;
-      });
-    }) || null;
+    var names = getProductOptionNames(product);
+    return (
+      product.variants.find(function (variant) {
+        return variant.options.every(function (opt, index) {
+          return selected[names[index]] === opt;
+        });
+      }) || null
+    );
   }
 
   function optionLooksLikeColor(name) {
-    return /color|colour|couleur/i.test(name);
+    return /color|colour|couleur/i.test(name || '');
   }
 
   function optionLooksLikeSize(name) {
-    return /size|taille/i.test(name);
+    return /size|taille|pointure/i.test(name || '');
   }
 
-  /* -------------------- Size select -------------------- */
+  function valuesLookLikeSize(values) {
+    if (!values || !values.length) return false;
+    return values.every(function (value) {
+      return /^(xxs|xs|s|m|l|xl|xxl|xxxl|2xl|3xl|4xl|5xl|6xl|\d+|medium|small|large|one size|onesize)$/i.test(
+        String(value).trim()
+      );
+    });
+  }
+
+  function valuesLookLikeColor(values) {
+    if (!values || !values.length) return false;
+    var colorWords = /white|black|blue|red|green|grey|gray|yellow|pink|brown|beige|navy|orange|purple|cream|gold|silver|ivory|khaki|olive|burgundy|maroon|teal|coral/i;
+    return values.some(function (value) {
+      return colorWords.test(String(value));
+    });
+  }
+
+  function shouldUseColorField(name, values) {
+    if (optionLooksLikeColor(name)) return true;
+    if (optionLooksLikeSize(name) || valuesLookLikeSize(values)) return false;
+    return valuesLookLikeColor(values);
+  }
+
+  function swatchColorForValue(value) {
+    var lower = String(value || '').toLowerCase();
+    var map = [
+      ['white', '#FFFFFF'],
+      ['ivory', '#FFFFF0'],
+      ['cream', '#FFFDD0'],
+      ['black', '#000000'],
+      ['navy', '#1B2A4A'],
+      ['blue', '#0D499F'],
+      ['red', '#B20F36'],
+      ['burgundy', '#6D1A2A'],
+      ['maroon', '#800000'],
+      ['green', '#2E5A3C'],
+      ['olive', '#556B2F'],
+      ['grey', '#AFAFB7'],
+      ['gray', '#AFAFB7'],
+      ['yellow', '#E6C200'],
+      ['pink', '#E8A0BF'],
+      ['brown', '#6B3F2A'],
+      ['beige', '#D8CBB5'],
+      ['khaki', '#C3B091'],
+      ['orange', '#E36C2C'],
+      ['purple', '#6B3FA0'],
+      ['gold', '#C5A028'],
+      ['silver', '#C0C0C0'],
+      ['teal', '#008080'],
+      ['coral', '#FF7F50']
+    ];
+    for (var i = 0; i < map.length; i++) {
+      if (lower.indexOf(map[i][0]) !== -1) return map[i][1];
+    }
+    return '#C8C8C8';
+  }
 
   function initSizeSelect(root) {
     var trigger = qs('[data-ecl-size-trigger]', root);
     var list = qs('[data-ecl-size-list]', root);
     var label = qs('[data-ecl-size-label]', root);
-    if (!trigger || !list) return;
+    if (!trigger || !list || !label) return;
 
-    trigger.addEventListener('click', function () {
+    trigger.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
       var open = root.classList.toggle('is-open');
       trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if (open) list.removeAttribute('hidden');
-      else list.setAttribute('hidden', '');
     });
 
     list.addEventListener('click', function (event) {
       var option = event.target.closest('.ecl-size-option');
       if (!option) return;
-      var value = option.getAttribute('data-value');
+      event.preventDefault();
+      event.stopPropagation();
+      var value = option.getAttribute('data-value') || option.textContent.trim();
       label.textContent = value;
+      trigger.classList.add('has-value');
       root.dataset.selected = value;
       qsa('.ecl-size-option', list).forEach(function (btn) {
         var active = btn === option;
@@ -98,7 +162,6 @@
       });
       root.classList.remove('is-open');
       trigger.setAttribute('aria-expanded', 'false');
-      list.setAttribute('hidden', '');
       root.dispatchEvent(new CustomEvent('ecl:option-change', { bubbles: true }));
     });
   }
@@ -117,10 +180,12 @@
     });
   }
 
-  /* -------------------- Cart -------------------- */
+  function cartAddUrl() {
+    return (window.Shopify && Shopify.routes && Shopify.routes.root ? Shopify.routes.root : '/') + 'cart/add.js';
+  }
 
   function postCartItems(items) {
-    return fetch(window.Shopify && Shopify.routes ? Shopify.routes.root + 'cart/add.js' : '/cart/add.js', {
+    return fetch(cartAddUrl(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ items: items })
@@ -134,7 +199,7 @@
 
   function fetchProductByHandle(handle) {
     return fetch('/products/' + handle + '.js').then(function (res) {
-      if (!res.ok) throw new Error('Product not found: ' + handle);
+      if (!res.ok) throw new Error('Product not found');
       return res.json();
     });
   }
@@ -147,33 +212,27 @@
         softWinterJacketCache = available && available.id;
         return softWinterJacketCache;
       })
-      .catch(function () {
-        // Fallback: search products JSON via predictive? Prefer title match from collection page data.
-        return null;
-      });
+      .catch(function () { return null; });
   }
 
   function selectedIncludesBlackAndMedium(selected) {
     var values = Object.keys(selected).map(function (key) {
       return String(selected[key]).toLowerCase();
     });
-    var hasBlack = values.some(function (v) { return v === 'black'; });
-    var hasMedium = values.some(function (v) { return v === 'medium' || v === 'm'; });
+    var hasBlack = values.indexOf('black') !== -1;
+    var hasMedium = values.indexOf('medium') !== -1 || values.indexOf('m') !== -1;
     return hasBlack && hasMedium;
   }
 
-  /* -------------------- Popup -------------------- */
-
   function PopupController(overlay) {
     this.overlay = overlay;
-    this.popup = qs('[data-ecl-popup]', overlay);
     this.image = qs('[data-ecl-popup-image]', overlay);
     this.title = qs('[data-ecl-popup-title]', overlay);
     this.price = qs('[data-ecl-popup-price]', overlay);
     this.description = qs('[data-ecl-popup-description]', overlay);
     this.fields = qs('[data-ecl-popup-fields]', overlay);
     this.status = qs('[data-ecl-popup-status]', overlay);
-    this.atc = qs('.ecl-popup__atc', overlay);
+    this.atc = qs('[data-ecl-atc]', overlay);
     this.product = null;
     this.selected = {};
     this.bind();
@@ -207,9 +266,10 @@
     this.render();
     this.overlay.hidden = false;
     this.overlay.setAttribute('aria-hidden', 'false');
+    var self = this;
     requestAnimationFrame(function () {
-      this.overlay.classList.add('is-open');
-    }.bind(this));
+      self.overlay.classList.add('is-open');
+    });
     document.documentElement.style.overflow = 'hidden';
   };
 
@@ -232,19 +292,29 @@
     this.description.textContent = stripHtml(product.description).slice(0, 180);
     this.fields.innerHTML = '';
 
-    product.options.forEach(function (optionName, index) {
+    var self = this;
+    var colorFields = [];
+    var sizeFields = [];
+
+    (product.options || []).forEach(function (option, index) {
+      var optionName = resolveOptionName(option);
       var values = uniqueOptionValues(product, index);
       if (!values.length) return;
-      this.selected[optionName] = values[0];
+      if (values.length === 1 && /default title/i.test(values[0])) return;
+      if (!optionName) optionName = 'Option ' + (index + 1);
 
-      if (optionLooksLikeColor(optionName) || (!optionLooksLikeSize(optionName) && index === 0 && values.length <= 4)) {
-        this.fields.appendChild(this.buildColorField(optionName, values));
+      if (shouldUseColorField(optionName, values)) {
+        self.selected[optionName] = values[0];
+        colorFields.push(self.buildColorField(optionName, values));
       } else {
-        this.fields.appendChild(this.buildSizeField(optionName, values));
+        self.selected[optionName] = '';
+        sizeFields.push(self.buildSizeField(optionName, values));
       }
-    }.bind(this));
+    });
 
-    // Prefer size for second option if names are generic
+    // Figma order: Color first, then Size
+    colorFields.forEach(function (el) { self.fields.appendChild(el); });
+    sizeFields.forEach(function (el) { self.fields.appendChild(el); });
     this.updatePrice();
   };
 
@@ -259,20 +329,15 @@
       '<div class="ecl-color__options" role="listbox"></div>';
     var options = qs('.ecl-color__options', wrap);
     values.forEach(function (value, i) {
-      var lower = value.toLowerCase();
-      var swatch = '#000000';
-      if (lower.indexOf('white') !== -1) swatch = '#FFFFFF';
-      else if (lower.indexOf('blue') !== -1) swatch = '#0D499F';
-      else if (lower.indexOf('grey') !== -1 || lower.indexOf('gray') !== -1) swatch = '#AFAFB7';
-      else if (lower.indexOf('red') !== -1) swatch = '#B20F36';
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ecl-color__option' + (i === 0 ? ' is-selected' : '');
       btn.setAttribute('data-value', value);
+      btn.setAttribute('role', 'option');
       btn.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
       btn.innerHTML =
-        '<span class="ecl-color__swatch" style="background:' + swatch + '" aria-hidden="true"></span>' +
-        '<span class="ecl-color__text">' + value + '</span>';
+        '<span class="ecl-color__swatch" style="background:' + swatchColorForValue(value) + '" aria-hidden="true"></span>' +
+        '<span class="ecl-color__name">' + value + '</span>';
       options.appendChild(btn);
     });
     initColorSelect(wrap);
@@ -287,21 +352,21 @@
     wrap.dataset.selected = '';
     wrap.innerHTML =
       '<span class="ecl-size__label">' + optionName + '</span>' +
-      '<button type="button" class="ecl-size__trigger" data-ecl-size-trigger aria-haspopup="listbox" aria-expanded="false">' +
+      '<button type="button" class="ecl-size__trigger" data-ecl-size-trigger aria-expanded="false">' +
       '<span class="ecl-size__trigger-text" data-ecl-size-label>Choose your size</span>' +
       '<span class="ecl-size__divider" aria-hidden="true"></span>' +
       '<span class="ecl-size__chevron" aria-hidden="true"></span>' +
-      '</button>' +
-      '<ul class="ecl-size__list" role="listbox" hidden data-ecl-size-list></ul>';
+      '</button><ul class="ecl-size__list" role="listbox" data-ecl-size-list></ul>';
     var list = qs('[data-ecl-size-list]', wrap);
     values.forEach(function (value) {
       var li = document.createElement('li');
-      li.innerHTML =
-        '<button type="button" class="ecl-size-option" data-value="' +
-        value.replace(/"/g, '&quot;') +
-        '" role="option" aria-selected="false">' +
-        value +
-        '</button>';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ecl-size-option';
+      btn.setAttribute('data-value', value);
+      btn.setAttribute('role', 'option');
+      btn.textContent = value;
+      li.appendChild(btn);
       list.appendChild(li);
     });
     initSizeSelect(wrap);
@@ -321,8 +386,7 @@
   PopupController.prototype.updatePrice = function () {
     this.syncSelectedFromDom();
     var variant = findVariant(this.product, this.selected);
-    var cents = variant ? variant.price : this.product.price;
-    this.price.textContent = formatMoney(cents);
+    this.price.textContent = formatMoney(variant ? variant.price : this.product.price);
   };
 
   PopupController.prototype.addToCart = function () {
@@ -330,7 +394,9 @@
     this.syncSelectedFromDom();
     this.status.classList.remove('is-error');
 
-    var missing = this.product.options.some(function (name) {
+    var missing = getProductOptionNames(this.product).some(function (name) {
+      if (!name || /^title$/i.test(name)) return false;
+      if (!(name in self.selected)) return false;
       return !self.selected[name];
     });
     if (missing) {
@@ -348,16 +414,13 @@
 
     var items = [{ id: variant.id, quantity: 1 }];
     var needsJacket = selectedIncludesBlackAndMedium(this.selected);
-
     this.atc.disabled = true;
     this.status.textContent = 'Adding…';
 
     var chain = Promise.resolve();
     if (needsJacket) {
       chain = getSoftWinterJacketVariantId().then(function (jacketId) {
-        if (jacketId && jacketId !== variant.id) {
-          items.push({ id: jacketId, quantity: 1 });
-        }
+        if (jacketId && jacketId !== variant.id) items.push({ id: jacketId, quantity: 1 });
       });
     }
 
@@ -367,17 +430,6 @@
         self.status.textContent = needsJacket
           ? 'Added to cart (including Soft Winter Jacket).'
           : 'Added to cart.';
-        document.dispatchEvent(new CustomEvent('cart:refresh'));
-        if (typeof window.publish === 'function' && window.PUB_SUB_EVENTS) {
-          // Dawn pubsub refresh if available
-        }
-        // Refresh cart drawer count if present
-        return fetch('/cart.js').then(function (r) { return r.json(); }).then(function (cart) {
-          qsa('.cart-count-bubble span[aria-hidden="true"], .cart-count-bubble span:not([aria-hidden])').forEach(function (el) {
-            if (el.closest('.visually-hidden')) return;
-            if (cart.item_count > 0) el.textContent = String(cart.item_count);
-          });
-        });
       })
       .catch(function (err) {
         self.status.textContent = err.message || 'Could not add to cart.';
@@ -388,15 +440,9 @@
       });
   };
 
-  /* -------------------- Product data cache -------------------- */
-
   var productCache = {};
 
-  function loadProduct(handleOrUrl) {
-    var handle = handleOrUrl;
-    if (handle.indexOf('/products/') !== -1) {
-      handle = handle.split('/products/')[1].split('?')[0].split('.')[0];
-    }
+  function loadProduct(handle) {
     if (productCache[handle]) return Promise.resolve(productCache[handle]);
     return fetchProductByHandle(handle).then(function (product) {
       productCache[handle] = product;
@@ -404,7 +450,31 @@
     });
   }
 
+  function initBannerMenu() {
+    qsa('[data-ecl-menu-toggle]').forEach(function (toggle) {
+      // getElementById, not querySelector — Shopify section ids can start with
+      // a digit, which makes '#<id>' an invalid selector and throws.
+      var menu = document.getElementById(toggle.getAttribute('aria-controls') || '');
+      if (!menu) {
+        var scope = toggle.closest('.ecl-banner');
+        menu = scope && qs('[data-ecl-menu]', scope);
+      }
+      if (!menu) return;
+      toggle.addEventListener('click', function () {
+        var open = menu.hidden;
+        menu.hidden = !open;
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
+  }
+
   function init() {
+    try {
+      initBannerMenu();
+    } catch (err) {
+      /* never let the banner menu break the popup below */
+    }
+
     var overlay = qs('[data-ecl-popup-overlay]');
     if (!overlay) return;
     var popup = new PopupController(overlay);
@@ -414,25 +484,18 @@
       if (!openBtn) return;
       event.preventDefault();
       var handle = openBtn.getAttribute('data-product-handle');
-      var url = openBtn.getAttribute('data-product-url');
-      var key = handle || url;
-      if (!key) return;
-      loadProduct(key)
+      if (!handle) return;
+      loadProduct(handle)
         .then(function (product) { popup.open(product); })
-        .catch(function () {
-          alert('Unable to load product details.');
-        });
+        .catch(function () { alert('Unable to load product details.'); });
     });
 
-    // Close size dropdowns on outside click
     document.addEventListener('click', function (event) {
       qsa('.ecl-size.is-open').forEach(function (sizeEl) {
         if (!sizeEl.contains(event.target)) {
           sizeEl.classList.remove('is-open');
           var trigger = qs('[data-ecl-size-trigger]', sizeEl);
-          var list = qs('[data-ecl-size-list]', sizeEl);
           if (trigger) trigger.setAttribute('aria-expanded', 'false');
-          if (list) list.setAttribute('hidden', '');
         }
       });
     });

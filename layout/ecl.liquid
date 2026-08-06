@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <title>
+      {{ page_title }}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+    {% render 'meta-tags' %}
+    {{ content_for_header }}
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+      *, *::before, *::after { box-sizing: border-box; }
+    </style>
+  </head>
+  <body>
+    <main id="MainContent" role="main" data-template="{{ template.name }}">
+      {{ content_for_layout }}
+    </main>
+  </body>
+</html>

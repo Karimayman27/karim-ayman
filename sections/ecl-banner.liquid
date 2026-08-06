@@ -1,64 +1,100 @@
+{%- comment -%}
+  ECL Banner — Gift Guide hero (built from scratch, no Dawn sections/components)
+  Red-box fields = customizer settings below.
+{%- endcomment -%}
+
 {{ 'ecl-library.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'ecl-library.js' | asset_url }}" defer="defer"></script>
 
-<section class="ecl-banner" id="ecl-banner-{{ section.id }}">
-  <div class="ecl-banner__media">
-    {%- if section.settings.image != blank -%}
-      {%- assign banner_alt = section.settings.image.alt | default: section.settings.heading -%}
-      {{
-        section.settings.image
-        | image_url: width: 2400
-        | image_tag:
-          loading: 'eager',
-          widths: '750, 1100, 1500, 1780, 2000, 2400',
-          sizes: '100vw',
-          alt: banner_alt
-      }}
-    {%- else -%}
-      {{ 'lifestyle-1' | placeholder_svg_tag: 'ecl-banner__placeholder' }}
-    {%- endif -%}
-  </div>
+{%- liquid
+  assign bg_image = section.settings.background_image
+  if bg_image != blank
+    assign bg_url = bg_image | image_url: width: 2400
+  else
+    assign bg_url = 'ecl-gift-guide-bg.svg' | asset_url
+  endif
+-%}
 
-  <div class="ecl-banner__content">
-    {%- if section.settings.brand != blank -%}
-      <p class="ecl-banner__brand">{{ section.settings.brand | escape }}</p>
-    {%- endif -%}
+<section
+  class="ecl-banner"
+  id="ecl-banner-{{ section.id }}"
+  style="--ecl-banner-bg: url('{{ bg_url }}');"
+>
+  <div class="ecl-banner__inner">
+    <header class="ecl-banner__top">
+      <button
+        type="button"
+        class="ecl-banner__menu-toggle"
+        data-ecl-menu-toggle
+        aria-expanded="false"
+        aria-controls="ecl-banner-menu-{{ section.id }}"
+        aria-label="Menu"
+      >
+        <span class="ecl-banner__menu-icon" aria-hidden="true"></span>
+      </button>
 
-    {%- if section.settings.heading != blank -%}
-      <h1 class="ecl-banner__heading">{{ section.settings.heading | escape }}</h1>
-    {%- endif -%}
+      <a class="ecl-banner__logo" href="{{ routes.root_url }}">
+        {{ section.settings.logo_text | escape }}
+      </a>
 
-    {%- if section.settings.text != blank -%}
-      <p class="ecl-banner__text">{{ section.settings.text | escape }}</p>
-    {%- endif -%}
+      {%- if section.settings.header_message != blank -%}
+        <p class="ecl-banner__message">{{ section.settings.header_message | escape }}</p>
+      {%- endif -%}
 
-    <div class="ecl-banner__actions">
-      {% render 'ecl-btn-shop-now',
-        label: section.settings.shop_label,
-        href: section.settings.shop_link,
-        class: 'ecl-btn--banner'
-      %}
-      {% render 'ecl-btn-choose-yours',
-        label: section.settings.choose_label,
-        href: section.settings.choose_link,
-        class: 'ecl-btn--banner'
-      %}
-    </div>
-  </div>
-
-  {%- if section.settings.show_nav -%}
-    <div class="ecl-banner__nav" aria-hidden="true">
-      <button type="button" class="ecl-banner__arrow ecl-banner__arrow--prev" tabindex="-1"></button>
-      <div class="ecl-banner__dots">
-        <button type="button" class="ecl-banner__dot is-active" tabindex="-1"></button>
-        <button type="button" class="ecl-banner__dot" tabindex="-1"></button>
-        <button type="button" class="ecl-banner__dot" tabindex="-1"></button>
-        <button type="button" class="ecl-banner__dot" tabindex="-1"></button>
-        <button type="button" class="ecl-banner__dot" tabindex="-1"></button>
+      <div class="ecl-banner__choose">
+        <a
+          class="ecl-btn ecl-btn--yellow"
+          href="{{ section.settings.choose_link | default: '#' }}"
+        >
+          <span>{{ section.settings.choose_label | escape }}</span>
+          <span class="ecl-btn__arrow" aria-hidden="true">→</span>
+        </a>
       </div>
-      <button type="button" class="ecl-banner__arrow ecl-banner__arrow--next" tabindex="-1"></button>
+    </header>
+
+    <div class="ecl-banner__menu" id="ecl-banner-menu-{{ section.id }}" data-ecl-menu hidden>
+      {%- if section.settings.header_message != blank -%}
+        <p class="ecl-banner__menu-message">{{ section.settings.header_message | escape }}</p>
+      {%- endif -%}
+      <a
+        class="ecl-btn ecl-btn--yellow"
+        href="{{ section.settings.choose_link | default: '#' }}"
+      >
+        <span>{{ section.settings.choose_label | escape }}</span>
+        <span class="ecl-btn__arrow" aria-hidden="true">→</span>
+      </a>
     </div>
-  {%- endif -%}
+
+    <div class="ecl-banner__hero">
+      {%- if section.settings.heading != blank -%}
+        <h1 class="ecl-banner__heading">{{ section.settings.heading | escape }}</h1>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <p class="ecl-banner__text">{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+
+      <div class="ecl-banner__shop">
+        <a
+          class="ecl-btn ecl-btn--black"
+          href="{{ section.settings.shop_link | default: '#' }}"
+        >
+          <span>{{ section.settings.shop_label | escape }}</span>
+          <span class="ecl-btn__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+
+    {%- assign strip_mobile = section.settings.strip_text_mobile | default: section.settings.strip_text -%}
+
+    {%- if section.settings.strip_text != blank -%}
+      <p class="ecl-banner__strip ecl-banner__strip--desktop">{{ section.settings.strip_text | escape }}</p>
+    {%- endif -%}
+
+    {%- if strip_mobile != blank -%}
+      <p class="ecl-banner__strip ecl-banner__strip--mobile">{{ strip_mobile | escape }}</p>
+    {%- endif -%}
+  </div>
 </section>
 
 {% schema %}
@@ -68,55 +104,84 @@
   "class": "section-ecl-banner",
   "settings": [
     {
+      "type": "header",
+      "content": "Background"
+    },
+    {
       "type": "image_picker",
-      "id": "image",
+      "id": "background_image",
       "label": "Background image"
     },
     {
+      "type": "header",
+      "content": "Top bar"
+    },
+    {
       "type": "text",
-      "id": "brand",
-      "label": "Brand",
-      "default": "LOUIS VUITTON"
+      "id": "logo_text",
+      "label": "Logo text",
+      "default": "TISSO VISON"
+    },
+    {
+      "type": "text",
+      "id": "header_message",
+      "label": "Header message",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    {
+      "type": "text",
+      "id": "choose_label",
+      "label": "Choose gift button label",
+      "default": "CHOOSE GIFT"
+    },
+    {
+      "type": "url",
+      "id": "choose_link",
+      "label": "Choose gift button link"
+    },
+    {
+      "type": "header",
+      "content": "Hero"
     },
     {
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Spring Collection"
+      "default": "The Gift Guide"
     },
     {
       "type": "textarea",
       "id": "text",
       "label": "Supporting text",
-      "default": "Discover the latest silhouettes crafted for the season."
+      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
     },
     {
       "type": "text",
       "id": "shop_label",
-      "label": "Shop now label",
-      "default": "Shop now"
+      "label": "Shop now button label",
+      "default": "SHOP NOW"
     },
     {
       "type": "url",
       "id": "shop_link",
-      "label": "Shop now link"
+      "label": "Shop now button link"
+    },
+    {
+      "type": "header",
+      "content": "Bottom strip"
     },
     {
       "type": "text",
-      "id": "choose_label",
-      "label": "Choose yours label",
-      "default": "choose yours"
+      "id": "strip_text",
+      "label": "Bottom strip text",
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
     },
     {
-      "type": "url",
-      "id": "choose_link",
-      "label": "Choose yours link"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_nav",
-      "label": "Show slider navigation",
-      "default": true
+      "type": "text",
+      "id": "strip_text_mobile",
+      "label": "Bottom strip text (mobile)",
+      "info": "Shown on screens under 750px. Leave blank to reuse the desktop text.",
+      "default": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR"
     }
   ],
   "presets": [
