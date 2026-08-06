@@ -128,6 +128,7 @@
 
 .ecl-banner__menu-icon {
   position: relative;
+  transition: background 0.2s ease;
 }
 
 .ecl-banner__menu-icon::before,
@@ -135,6 +136,7 @@
   content: '';
   position: absolute;
   left: 0;
+  transition: top 0.2s ease, transform 0.2s ease;
 }
 
 .ecl-banner__menu-icon::before {
@@ -145,13 +147,28 @@
   top: 6px;
 }
 
+/* Open state: the three bars collapse into an × */
+.ecl-banner__menu-toggle[aria-expanded='true'] .ecl-banner__menu-icon {
+  background: transparent;
+}
+
+.ecl-banner__menu-toggle[aria-expanded='true'] .ecl-banner__menu-icon::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.ecl-banner__menu-toggle[aria-expanded='true'] .ecl-banner__menu-icon::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
 .ecl-banner__menu {
   display: none;
   box-sizing: border-box;
   width: 100%;
-  padding: 16px;
-  background: var(--ecl-white);
-  border-bottom: 1px solid #eaeaea;
+  padding: 28px 16px 32px;
+  background: #efefef;
+  text-align: center;
 }
 
 @media screen and (max-width: 749px) {
@@ -161,12 +178,20 @@
 }
 
 .ecl-banner__menu-message {
-  margin: 0 0 12px;
-  font-family: var(--ecl-font);
-  font-weight: 500;
-  font-size: 13px;
+  margin: 0 0 20px;
+  font-family: var(--ecl-font-display);
+  font-weight: 400;
+  font-size: 20px;
   line-height: 1.3;
+  letter-spacing: 0;
   color: var(--ecl-black);
+}
+
+.ecl-banner__menu .ecl-btn--yellow {
+  box-sizing: border-box;
+  width: min(100%, 340px);
+  height: 56px;
+  padding: 0 24px;
 }
 
 /* Hero copy block — lower left of white illustration field */
@@ -239,7 +264,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 24px;
   margin: 0;
   padding: 12px 18px;
   border: none;
@@ -369,16 +394,20 @@
 }
 
 @media screen and (max-width: 749px) {
+  /* Mobile: white field at the top for the copy, artwork anchored to the
+     bottom at natural scale (matches the 375×421 mobile frame). */
   .ecl-banner {
     aspect-ratio: auto;
-    min-height: 520px;
-    background-size: cover;
-    background-position: center top;
+    min-height: 0;
+    background-color: var(--ecl-white);
+    background-size: 100% auto;
+    background-position: left bottom;
+    background-repeat: no-repeat;
   }
 
   .ecl-banner__top {
     height: auto;
-    min-height: 56px;
+    min-height: 68px;
     padding: 12px 16px;
     background: var(--ecl-gray);
   }
@@ -396,7 +425,8 @@
   .ecl-banner__logo {
     flex: 1;
     justify-content: center;
-    font-size: 20px;
+    font-size: 26px;
+    letter-spacing: 0.1em;
   }
 
   .ecl-banner__message,
@@ -404,29 +434,44 @@
     display: none;
   }
 
+  /* Copy sits in the white space above the illustration; the CTA then
+     overlaps the artwork lower down. */
   .ecl-banner__hero {
     align-items: center;
     justify-content: flex-start;
-    padding: 32px 16px 40px;
+    padding: 36px 16px 0;
     max-width: 100%;
     text-align: center;
   }
 
   .ecl-banner__heading {
-    font-size: 36px;
+    margin: 0 0 18px;
+    font-size: 40px;
   }
 
   .ecl-banner__text {
-    font-size: 16px;
-    max-width: 100%;
+    max-width: 300px;
+    margin: 0;
+    font-size: 17px;
+  }
+
+  .ecl-banner__shop {
+    width: 100%;
+    margin-top: clamp(150px, 46vw, 260px);
+    margin-bottom: 24px;
+  }
+
+  .ecl-banner__shop .ecl-btn--black {
+    width: 100%;
+    height: 56px;
   }
 
   .ecl-banner__strip {
     height: auto;
-    min-height: 34px;
-    font-size: 9px;
-    letter-spacing: 0.04em;
-    padding: 10px 12px;
+    min-height: 40px;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    padding: 12px;
   }
 }
 
@@ -455,7 +500,7 @@
 
 .ecl-grid__list {
   display: grid;
-  grid-template-columns: repeat(2, 433px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   justify-content: center;
   gap: 8px;
   margin: 0;
@@ -463,10 +508,13 @@
   list-style: none;
 }
 
+/* Mobile: fluid cells that never exceed the viewport.
+   The fixed 433×444 Figma box is applied at ≥750px below. */
 .ecl-grid__item {
   position: relative;
-  width: 433px;
-  height: 444px;
+  width: 100%;
+  max-width: 433px;
+  aspect-ratio: 433 / 444;
   transform: rotate(0deg);
   opacity: 1;
   overflow: hidden;
@@ -565,8 +613,17 @@
   }
 
   .ecl-grid__list {
-    grid-template-columns: repeat(3, 433px);
+    grid-template-columns: repeat(3, minmax(0, 433px));
     gap: 10px;
+  }
+}
+
+/* Full Figma box once there is room for 3 × 433px + gaps + padding */
+@media screen and (min-width: 1420px) {
+  .ecl-grid__item {
+    width: 433px;
+    height: 444px;
+    aspect-ratio: auto;
   }
 }
 
@@ -721,12 +778,12 @@
 .ecl-color__option {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   box-sizing: border-box;
   min-height: 48px;
   height: 48px;
   margin: 0;
-  padding: 0 16px;
+  padding: 0;
   border: none;
   border-right: 1px solid var(--ecl-black);
   background: var(--ecl-white);
@@ -739,11 +796,19 @@
   border-right: none;
 }
 
+/* Left color bar — shows the actual colour of the value */
 .ecl-color__swatch {
-  display: none;
+  flex-shrink: 0;
+  width: 6px;
+  height: 100%;
+  background: var(--ecl-black);
 }
 
 .ecl-color__name {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding: 0 16px;
   font-family: var(--ecl-font-display);
   font-weight: 400;
   font-style: normal;
@@ -754,7 +819,7 @@
   text-transform: capitalize;
 }
 
-.ecl-color__option.is-selected {
+.ecl-color__option.is-selected .ecl-color__name {
   background: var(--ecl-black);
   color: var(--ecl-white);
 }
@@ -765,7 +830,7 @@
   align-items: center;
   width: 100%;
   height: 48px;
-  padding: 0 48px;
+  padding: 0 56px 0 16px;
   border: 1px solid var(--ecl-black);
   background: var(--ecl-white);
   font-family: var(--ecl-font-display);
@@ -788,13 +853,19 @@
   white-space: nowrap;
 }
 
+/* Grey vertical rule separating the label area from the chevron */
 .ecl-size__divider {
-  display: none;
+  position: absolute;
+  right: 56px;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px solid #d9d9d9;
 }
 
 .ecl-size__chevron {
   position: absolute;
-  right: 16px;
+  right: 20px;
   top: 50%;
   width: 8px;
   height: 8px;

@@ -452,7 +452,13 @@
 
   function initBannerMenu() {
     qsa('[data-ecl-menu-toggle]').forEach(function (toggle) {
-      var menu = qs('#' + toggle.getAttribute('aria-controls'));
+      // getElementById, not querySelector — Shopify section ids can start with
+      // a digit, which makes '#<id>' an invalid selector and throws.
+      var menu = document.getElementById(toggle.getAttribute('aria-controls') || '');
+      if (!menu) {
+        var scope = toggle.closest('.ecl-banner');
+        menu = scope && qs('[data-ecl-menu]', scope);
+      }
       if (!menu) return;
       toggle.addEventListener('click', function () {
         var open = menu.hidden;
@@ -463,7 +469,11 @@
   }
 
   function init() {
-    initBannerMenu();
+    try {
+      initBannerMenu();
+    } catch (err) {
+      /* never let the banner menu break the popup below */
+    }
 
     var overlay = qs('[data-ecl-popup-overlay]');
     if (!overlay) return;
