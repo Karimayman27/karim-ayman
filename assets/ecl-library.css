@@ -356,7 +356,8 @@
 
 .ecl-grid__list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 433px);
+  justify-content: center;
   gap: 8px;
   margin: 0;
   padding: 0;
@@ -365,7 +366,10 @@
 
 .ecl-grid__item {
   position: relative;
-  aspect-ratio: 3 / 4;
+  width: 433px;
+  height: 444px;
+  transform: rotate(0deg);
+  opacity: 1;
   overflow: hidden;
   background: #f4f4f4;
 }
@@ -462,7 +466,7 @@
   }
 
   .ecl-grid__list {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 433px);
     gap: 10px;
   }
 }
@@ -614,26 +618,23 @@
 .ecl-color__options {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 8px;
   width: 100%;
-  border: 1px solid var(--ecl-black);
-  background: var(--ecl-white);
 }
 
 .ecl-color__option {
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  align-items: stretch;
   box-sizing: border-box;
   min-height: 36px;
   height: 36px;
   margin: 0;
-  padding: 0 10px 0 14px;
-  border: none;
-  border-right: 1px solid var(--ecl-black);
+  padding: 0;
+  border: 1px solid #d9d9d9;
   background: var(--ecl-white);
   cursor: pointer;
+  overflow: hidden;
   font-family: var(--ecl-font-display);
   font-weight: 400;
   font-size: 16px;
@@ -645,32 +646,26 @@
 
 .ecl-color__swatch {
   flex-shrink: 0;
-  width: 10px;
-  height: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.35);
-  box-sizing: border-box;
+  width: 8px;
+  height: 100%;
+  background: var(--ecl-black);
 }
 
 .ecl-color__name {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding: 0 14px;
   line-height: 1;
 }
 
-.ecl-color__option:last-child,
-.ecl-color__option:nth-child(2n) {
-  border-right: none;
-}
-
-.ecl-color__option:nth-child(n + 3) {
-  border-top: 1px solid var(--ecl-black);
-}
-
 .ecl-color__option.is-selected {
+  border-color: var(--ecl-black);
+}
+
+.ecl-color__option.is-selected .ecl-color__name {
   background: var(--ecl-black);
   color: var(--ecl-white);
-}
-
-.ecl-color__option.is-selected .ecl-color__swatch {
-  border-color: rgba(255, 255, 255, 0.55);
 }
 
 .ecl-size__trigger {
