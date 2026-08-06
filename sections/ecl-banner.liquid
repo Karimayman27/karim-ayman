@@ -85,8 +85,14 @@
       </div>
     </div>
 
+    {%- assign strip_mobile = section.settings.strip_text_mobile | default: section.settings.strip_text -%}
+
     {%- if section.settings.strip_text != blank -%}
-      <p class="ecl-banner__strip">{{ section.settings.strip_text | escape }}</p>
+      <p class="ecl-banner__strip ecl-banner__strip--desktop">{{ section.settings.strip_text | escape }}</p>
+    {%- endif -%}
+
+    {%- if strip_mobile != blank -%}
+      <p class="ecl-banner__strip ecl-banner__strip--mobile">{{ strip_mobile | escape }}</p>
     {%- endif -%}
   </div>
 </section>
@@ -169,6 +175,13 @@
       "id": "strip_text",
       "label": "Bottom strip text",
       "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+    },
+    {
+      "type": "text",
+      "id": "strip_text_mobile",
+      "label": "Bottom strip text (mobile)",
+      "info": "Shown on screens under 750px. Leave blank to reuse the desktop text.",
+      "default": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR"
     }
   ],
   "presets": [

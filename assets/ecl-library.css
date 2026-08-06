@@ -260,6 +260,21 @@
   color: var(--ecl-black);
 }
 
+/* The strip renders twice with different copy; show one per breakpoint. */
+.ecl-banner__strip.ecl-banner__strip--mobile {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .ecl-banner__strip.ecl-banner__strip--desktop {
+    display: none;
+  }
+
+  .ecl-banner__strip.ecl-banner__strip--mobile {
+    display: flex;
+  }
+}
+
 /* Buttons — from scratch (not Dawn .button)
    Fill animation: hover expands from right → left */
 .ecl-btn {
@@ -442,13 +457,13 @@
   .ecl-banner__hero {
     align-items: center;
     justify-content: flex-start;
-    padding: 36px 16px 0;
+    padding: 24px 16px 0;
     max-width: 100%;
     text-align: center;
   }
 
   .ecl-banner__heading {
-    margin: 0 0 18px;
+    margin: 0 0 12px;
     font-size: 40px;
   }
 
@@ -460,7 +475,7 @@
 
   .ecl-banner__shop {
     width: 100%;
-    margin-top: clamp(150px, 46vw, 260px);
+    margin-top: clamp(90px, 30vw, 170px);
     margin-bottom: 24px;
   }
 
@@ -504,6 +519,7 @@
 @media screen and (max-width: 749px) {
   .ecl-grid__heading {
     font-size: 26px;
+    text-align: center;
   }
 }
 
