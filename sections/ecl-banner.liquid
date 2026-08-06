@@ -22,6 +22,17 @@
 >
   <div class="ecl-banner__inner">
     <header class="ecl-banner__top">
+      <button
+        type="button"
+        class="ecl-banner__menu-toggle"
+        data-ecl-menu-toggle
+        aria-expanded="false"
+        aria-controls="ecl-banner-menu-{{ section.id }}"
+        aria-label="Menu"
+      >
+        <span class="ecl-banner__menu-icon" aria-hidden="true"></span>
+      </button>
+
       <a class="ecl-banner__logo" href="{{ routes.root_url }}">
         {{ section.settings.logo_text | escape }}
       </a>
@@ -40,6 +51,19 @@
         </a>
       </div>
     </header>
+
+    <div class="ecl-banner__menu" id="ecl-banner-menu-{{ section.id }}" data-ecl-menu hidden>
+      {%- if section.settings.header_message != blank -%}
+        <p class="ecl-banner__menu-message">{{ section.settings.header_message | escape }}</p>
+      {%- endif -%}
+      <a
+        class="ecl-btn ecl-btn--yellow"
+        href="{{ section.settings.choose_link | default: '#' }}"
+      >
+        <span>{{ section.settings.choose_label | escape }}</span>
+        <span class="ecl-btn__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
 
     <div class="ecl-banner__hero">
       {%- if section.settings.heading != blank -%}

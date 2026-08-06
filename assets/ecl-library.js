@@ -450,7 +450,21 @@
     });
   }
 
+  function initBannerMenu() {
+    qsa('[data-ecl-menu-toggle]').forEach(function (toggle) {
+      var menu = qs('#' + toggle.getAttribute('aria-controls'));
+      if (!menu) return;
+      toggle.addEventListener('click', function () {
+        var open = menu.hidden;
+        menu.hidden = !open;
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
+  }
+
   function init() {
+    initBannerMenu();
+
     var overlay = qs('[data-ecl-popup-overlay]');
     if (!overlay) return;
     var popup = new PopupController(overlay);
