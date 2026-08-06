@@ -785,21 +785,17 @@
   margin: 0;
   padding: 0;
   border: none;
-  border-right: 1px solid var(--ecl-black);
   background: var(--ecl-white);
   cursor: pointer;
   overflow: hidden;
   color: var(--ecl-black);
 }
 
-.ecl-color__option:last-child {
-  border-right: none;
-}
-
-/* Left color bar — shows the actual colour of the value */
+/* Left colour bar — the actual colour of the value. It also acts as the
+   divider between cells, so no border is needed between options. */
 .ecl-color__swatch {
   flex-shrink: 0;
-  width: 6px;
+  width: 8px;
   height: 100%;
   background: var(--ecl-black);
 }
