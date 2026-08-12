@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "layout": "ecl",
   "sections": {
@@ -7,21 +16,66 @@
         "logo_text": "TISSO VISON",
         "header_message": "Find the ideal gift for your loved ones.",
         "choose_label": "CHOOSE GIFT",
+        "choose_link": "",
         "heading": "The Gift Guide",
         "text": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.",
         "shop_label": "SHOP NOW",
-        "strip_text": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+        "shop_link": "",
+        "strip_text": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL",
+        "strip_text_mobile": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR"
       }
     },
     "ecl_grid": {
       "type": "ecl-product-grid",
       "blocks": {
-        "product_1": { "type": "product", "settings": { "hotspot_x": 28, "hotspot_y": 62 } },
-        "product_2": { "type": "product", "settings": { "hotspot_x": 52, "hotspot_y": 40 } },
-        "product_3": { "type": "product", "settings": { "hotspot_x": 48, "hotspot_y": 48 } },
-        "product_4": { "type": "product", "settings": { "hotspot_x": 36, "hotspot_y": 38 } },
-        "product_5": { "type": "product", "settings": { "hotspot_x": 58, "hotspot_y": 52 } },
-        "product_6": { "type": "product", "settings": { "hotspot_x": 42, "hotspot_y": 58 } }
+        "product_1": {
+          "type": "product",
+          "settings": {
+            "product": "blue-silk-tuxedo",
+            "hotspot_x": 28,
+            "hotspot_y": 62
+          }
+        },
+        "product_2": {
+          "type": "product",
+          "settings": {
+            "product": "classic-leather-jacket",
+            "hotspot_x": 52,
+            "hotspot_y": 40
+          }
+        },
+        "product_3": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "hotspot_x": 48,
+            "hotspot_y": 48
+          }
+        },
+        "product_4": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "hotspot_x": 36,
+            "hotspot_y": 38
+          }
+        },
+        "product_5": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "hotspot_x": 58,
+            "hotspot_y": 52
+          }
+        },
+        "product_6": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "hotspot_x": 42,
+            "hotspot_y": 58
+          }
+        }
       },
       "block_order": [
         "product_1",
@@ -36,5 +90,8 @@
       }
     }
   },
-  "order": ["ecl_banner", "ecl_grid"]
+  "order": [
+    "ecl_banner",
+    "ecl_grid"
+  ]
 }
